@@ -1,0 +1,39 @@
+version: "3.7"
+services:
+  http:
+    build: http
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./../:/var/www/html
+      - ./php/php.ini:/usr/local/etc/php/php.ini
+      - ./http/conf/000-default.conf:/etc/apache2/sites-available/000-default.conf
+    user:
+      1000:1000
+    networks:
+      codigos-postales:
+        aliases:
+          - laravel.local
+    env_file:
+      - ./.env
+  database:
+    build: database
+    ports: 
+      - 3306:3306
+    volumes:
+      - ./database/var/lib/mysql:/var/lib/mysql
+    networks:
+      - codigos-postales
+    domainname: mysql
+    hostname: mysql
+    env_file:
+      - ./.env
+    restart: on-failure
+  node:
+    build: node
+    volumes: 
+      - ./../:/usr/app
+networks:
+  codigos-postales:
+    driver: bridge
